@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: currencyMail
+    environment:
+      - DB_USER=root
+      - DB_PASSWORD=rootroot
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=currency
+      - TEST_DSN=root:rootroot@tcp(mysql:3306)/currency_test
+      - SMTP_HOST=smtp.example.com
+      - SMTP_PORT=587
+      - SMTP_USER=your-email@example.com
+      - SMTP_PASSWORD=your-email-password
+      - FROM_EMAIL=your-email@example.com
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootroot
+      MYSQL_DATABASE: currency
+      MYSQL_DATABASE_TEST: currency_test
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
